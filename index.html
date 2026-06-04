@@ -304,8 +304,8 @@ function drawChart(canvas,idx){
   var barW=Math.max(3,cw/24*0.6);
   var ch4=ch/4;
   var dayPrecip=data.precip;
-  for(var i=0;i<rains.length;i++){if(rains[i]>0){
-    var x=padL+cw*i/23;var bh;
+  for(var i=0;i<pts.length;i++){if(rains[i]>0){
+    var x=padL+cw*pts[i].hour/23;var bh;
     if(dayPrecip<10){bh=Math.max(ch4*0.3,(rains[i]/10)*ch4)}
     else if(dayPrecip<25){bh=ch4+((dayPrecip-10)/15)*ch4*1.5}
     else{bh=ch4*2.5+((Math.min(dayPrecip,80)-25)/55)*ch4*1.5}
@@ -313,11 +313,11 @@ function drawChart(canvas,idx){
     ctx.fillStyle='rgba(40,130,255,'+alpha+')';ctx.fillRect(x-barW/2,padT+ch-bh,barW,bh)
   }}
   ctx.beginPath();ctx.strokeStyle='rgba(255,210,80,.9)';ctx.lineWidth=2.5;ctx.lineJoin='round';
-  for(var i=0;i<temps.length;i++){var x=padL+cw*i/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+  for(var i=0;i<pts.length;i++){var x=padL+cw*pts[i].hour/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
   ctx.stroke();
-  for(var i=0;i<temps.length;i++){
-    var x=padL+cw*i/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));
-    var isNow=isToday&&i===currentHour;
+  for(var i=0;i<pts.length;i++){
+    var x=padL+cw*pts[i].hour/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));
+    var isNow=isToday&&pts[i].hour===currentHour;
     ctx.beginPath();ctx.arc(x,y,isNow?5.5:2.5,0,Math.PI*2);
     ctx.fillStyle=isNow?'#fff':'rgba(255,210,80,.9)';ctx.fill();
     if(isNow){
@@ -456,11 +456,11 @@ detail.forEach(function(d2,idx){
   for(var h=0;h<24;h++){
     var key=d2.date+'_'+h;
     if(passedMap[key]&&passedMap[key].temp!==null){pts.push({temp:passedMap[key].temp,rain:passedMap[key].rain,hour:h})}
-    else if(fc&&fc.hi!==null&&fc.lo!==null){
+    else if(dayCount>1&&fc&&fc.hi!==null&&fc.lo!==null){
       var t=interpTemp(h,fc.lo,fc.hi),r=0;
       if(fc.precip>0&&h>=8&&h<=19)r=fc.precip/12;
       // add jitter for future days to make curve more wavy
-      if(dayCount>1){var amp=(fc.hi-fc.lo)*0.12;t+=Math.round((Math.sin(h*2.7+dayCount*5)*amp)*10)/10}
+      var amp=(fc.hi-fc.lo)*0.12;t+=Math.round((Math.sin(h*2.7+dayCount*5)*amp)*10)/10;
       pts.push({temp:t,rain:r,hour:h})
     }
   }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" style="background:#1a1a2e">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
@@ -8,14 +8,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="本溪天气">
 <meta name="theme-color" content="#1a1a2e">
-<style>html,body{background:#1a1a2e!important}</style>
 <link rel="manifest" href="manifest.json">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative;background:#1a1a2e}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
 
 /* dynamic bg base */
-#wbg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;transition:background 2s;background:#1a1a2e}
+#wbg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;transition:background 2s}
 #weather-fx{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;overflow:hidden;pointer-events:none}
 .wrap{max-width:420px;margin:0 auto;padding:16px 16px 30px;position:relative;z-index:1}
 
@@ -134,16 +133,12 @@ canvas{display:block;width:100%;height:160px;position:relative;z-index:1}
 .upt{text-align:center;font-size:.68em;opacity:.25;padding:16px 0 0}
 .loading{text-align:center;padding:80px 0;font-size:.9em;opacity:.5}
 </style>
-<link rel="apple-touch-startup-image" href="splash-1206x2622.png" media="screen and (device-width:402px) and (device-height:874px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="splash-1290x2796.png" media="screen and (device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="splash-1170x2532.png" media="screen and (device-width:390px) and (device-height:844px) and (-webkit-device-pixel-ratio:3)">
-<link rel="apple-touch-startup-image" href="splash-750x1334.png" media="screen and (device-width:375px) and (device-height:667px) and (-webkit-device-pixel-ratio:2)">
 </head>
 <body>
 <div id="wbg"></div>
 <div id="weather-fx"></div>
 <div class="wrap" id="app">
-<div class="loading" style="display:none">正在获取天气数据...</div>
+<div class="loading">正在获取天气数据...</div>
 </div>
 <script>
 var STATION='fZXDt';
@@ -494,6 +489,7 @@ html+='</div></div>';
 
 html+='<div class="fc-title">7日预报</div><div class="fc'+((currentRealWeather==='晴'&&isDayNow)||currentRealWeather==='多云'||currentRealWeather==='阴'?' bright-bg':'')+'">';
 detail.forEach(function(d2){
+  if(d2.date<todayStr)return;
   var label=todayLb(d2.date),fd=fmtD(d2.date);
   var wInfo=d2.day.weather.info,wPow=d2.day.wind.power,wHi=d2.day.weather.temperature;
   // today daytime data may be 9999 (past daytime), use night forecast for weather/wind
@@ -525,7 +521,4 @@ box.addEventListener('touchmove',function(e){var dx=e.touches[0].clientX-sx,dy=e
 box.addEventListener('touchend',function(e){if(!sw)return;var dx=e.changedTouches[0].clientX-sx;if(dx<-30&&currentDayIdx<dayData.length-1){currentDayIdx++;drawChart(c,currentDayIdx);updateBgForDay(currentDayIdx)}else if(dx>30&&currentDayIdx>0){currentDayIdx--;drawChart(c,currentDayIdx);updateBgForDay(currentDayIdx)}},{passive:true});
 
 }).catch(function(e){
-document.getElementById('app').innerHTML='<div style="text-align:center;padding:80px 0;opacity:.6">获取数据失败<br><span style="font-size:.8em;opacity:.5">'+e.message+'</span></div>'});
-</script>
-</body>
-</html>
+document.getElementById('app').innerHTML='<div style="text-align:center;padding:80px 0;opacity:.6">获取数据失败<br><span style="font-size:.8em;opacity:.5">'+e.message+'</span></div>

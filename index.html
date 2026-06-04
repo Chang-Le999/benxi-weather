@@ -103,13 +103,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .chart-sec .ct{font-size:.8em;opacity:.75;padding:6px 0;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between}
 .chart-box{background:rgba(40,44,48,.28);border-radius:14px;padding:14px 10px 10px;position:relative;touch-action:pan-y;overflow:hidden}
 .chart-box.bright-bg{background:rgba(40,44,48,.28)}
-#chart-fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .4s}
+#chart-fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .4s}
 #chart-fx.active{opacity:1}
 #chart-fx .cloud{animation:drift 28s linear infinite;opacity:.3}
-#chart-fx .rain-layer i{opacity:.25}
-#chart-fx .snow-layer i{opacity:.2}
-#chart-fx .dust-layer i{opacity:.2}
-#chart-fx .fog-overlay{opacity:.15}
+#chart-fx .rain-layer i{opacity:.6}
+#chart-fx .snow-layer i{opacity:.45}
+#chart-fx .dust-layer i{opacity:.35}
+#chart-fx .fog-overlay{opacity:.25}
 canvas{display:block;width:100%;height:160px;position:relative;z-index:1}
 .dots{display:flex;justify-content:center;gap:6px;padding:8px 0 0}
 .dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .2s;cursor:pointer}

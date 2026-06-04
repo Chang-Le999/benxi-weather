@@ -351,18 +351,30 @@ function updateBgForDay(idx){
   else{bg='linear-gradient(180deg,rgba(74,144,217,.6),rgba(135,206,235,.45),rgba(184,223,245,.35))'}
   fx.style.background=bg;
   // render weather effects into chart-fx (low saturation via CSS)
+  // use precipitation mm to determine rain intensity, more reliable than text matching
+  var mm=data.precip||0;
+  var hasSnow=wInfo.indexOf('雪')>-1;
+  var hasDust=wInfo.indexOf('沙')>-1||wInfo.indexOf('尘')>-1;
+  var isFog=wInfo==='雾'||wInfo.indexOf('雾')>-1;
   var cls='';
   if(wInfo==='晴'){cls='sunny-d'}
   else if(wInfo==='多云'){cls='cloudy'}
   else if(wInfo==='阴'){cls='overcast'}
-  else if(wInfo==='小雨'||wInfo==='阵雨'){cls='rain-l'}
-  else if(wInfo==='中雨'){cls='rain-m'}
-  else if(wInfo==='大雨'||wInfo==='暴雨'||wInfo==='雷阵雨'){cls='rain-h'}
-  else if(wInfo==='小雪'){cls='snow-l'}
-  else if(wInfo==='中雪'){cls='snow-m'}
-  else if(wInfo==='大雪'||wInfo==='暴雪'){cls='snow-h'}
-  else if(wInfo==='雾'){cls='fog'}
-  else if(wInfo==='沙尘暴'||wInfo==='扬沙'||wInfo==='浮尘'){cls='dust'}
+  else if(mm>0&&!hasSnow){
+    // rain level by precipitation mm
+    if(mm<10)cls='rain-l';
+    else if(mm<25)cls='rain-m';
+    else cls='rain-h';
+  }
+  else if(hasSnow&&mm>0){
+    if(mm<5)cls='snow-l';
+    else if(mm<10)cls='snow-m';
+    else cls='snow-h';
+  }
+  else if(wInfo.indexOf('雨')>-1){cls='rain-l'}  // fallback: text has rain but precip=0
+  else if(hasSnow){cls='snow-l'}  // fallback: text has snow but precip=0
+  else if(isFog){cls='fog'}
+  else if(hasDust){cls='dust'}
   else{cls='cloudy'}
   // clouds
   if(cls==='cloudy'||cls==='overcast'||cls==='sunny-d'){

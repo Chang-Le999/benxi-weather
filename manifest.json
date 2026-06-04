@@ -2,7 +2,7 @@
   "name": "本溪天气",
   "short_name": "本溪天气",
   "description": "本溪实时天气与7日预报",
-  "start_url": "天气_本溪.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",

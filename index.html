@@ -335,11 +335,21 @@ function drawChart(canvas,idx){
 function updateBgForDay(idx){
   var fx=document.getElementById('chart-fx');if(!fx)return;
   var isToday=idx===todayIdx;
-  if(isToday){fx.innerHTML='';fx.classList.remove('active');return}
+  if(isToday){fx.innerHTML='';fx.classList.remove('active');fx.style.background='';return}
   // future day: render low-sat weather inside chart-box
   var data=dayData[idx];if(!data)return;
   var wInfo=data.weather||'多云';
   fx.innerHTML='';
+  // add weather background gradient
+  var bg='';
+  if(wInfo==='晴'){bg='linear-gradient(180deg,rgba(74,144,217,.35),rgba(135,206,235,.25),rgba(184,223,245,.2))'}
+  else if(wInfo==='多云'){bg='linear-gradient(180deg,rgba(74,144,217,.3),rgba(135,206,235,.2),rgba(184,223,245,.15))'}
+  else if(wInfo==='阴'){bg='linear-gradient(180deg,rgba(80,96,112,.35),rgba(112,128,160,.25),rgba(144,160,181,.2))'}
+  else if(wInfo.indexOf('雨')>-1){bg='linear-gradient(180deg,rgba(30,42,56,.4),rgba(46,62,80,.3),rgba(58,74,88,.25))'}
+  else if(wInfo.indexOf('雪')>-1){bg='linear-gradient(180deg,rgba(96,112,128,.3),rgba(128,144,160,.2),rgba(160,176,192,.15))'}
+  else if(wInfo==='雾'){bg='linear-gradient(180deg,rgba(90,101,112,.3),rgba(120,133,143,.2),rgba(144,154,165,.15))'}
+  else{bg='linear-gradient(180deg,rgba(74,144,217,.3),rgba(135,206,235,.2),rgba(184,223,245,.15))'}
+  fx.style.background=bg;
   // render weather effects into chart-fx (low saturation via CSS)
   var cls='';
   if(wInfo==='晴'){cls='sunny-d'}

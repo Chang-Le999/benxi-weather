@@ -295,10 +295,10 @@ function drawChart(canvas,idx){
   var rMax=Math.max.apply(null,rains.filter(function(r){return r>0}));if(rMax<1)rMax=1;
   var padL=30,padR=14,padT=14,padB=24,cw=w-padL-padR,ch=h-padT-padB;
   ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
-  // temp labels - higher saturation for today
   var isToday=idx===todayIdx;
-  var lblAlpha=isToday?'.8':'.55';
-  var timeAlpha=isToday?'.75':'.5';
+  var lblAlpha=isToday?'.85':'.8';
+  var timeAlpha=isToday?'.75':'.7';
+  var barAlpha=isToday?'.7':'.65';
   for(var i=0;i<=4;i++){var y=padT+ch*i/4;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
     var tv=Math.round(tMax-(tMax-tMin)*i/4);ctx.fillStyle='rgba(255,255,255,'+lblAlpha+')';ctx.font='bold 10px sans-serif';ctx.textAlign='right';ctx.fillText(tv+'°',padL-4,y+3)}
   ctx.fillStyle='rgba(255,255,255,'+timeAlpha+')';ctx.font='10px sans-serif';ctx.textAlign='center';
@@ -311,7 +311,7 @@ function drawChart(canvas,idx){
     if(dayPrecip<10){bh=Math.max(ch4*0.3,(rains[i]/10)*ch4)}
     else if(dayPrecip<25){bh=ch4+((dayPrecip-10)/15)*ch4*1.5}
     else{bh=ch4*2.5+((Math.min(dayPrecip,80)-25)/55)*ch4*1.5}
-    var alpha=isToday?(dayPrecip<10?.65:(dayPrecip<25?.75:.85)):(dayPrecip<10?.45:(dayPrecip<25?.55:.65));
+    var alpha=isToday?(dayPrecip<10?.65:(dayPrecip<25?.75:.85)):(dayPrecip<10?.6:(dayPrecip<25?.7:.8));
     ctx.fillStyle='rgba(40,130,255,'+alpha+')';ctx.fillRect(x-barW/2,padT+ch-bh,barW,bh)
   }}
   ctx.beginPath();ctx.strokeStyle='rgba(255,210,80,1)';ctx.lineWidth=2.5;ctx.lineJoin='round';
@@ -321,7 +321,7 @@ function drawChart(canvas,idx){
     var x=padL+cw*pts[i].hour/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));
     var isNow=isToday&&pts[i].hour===currentHour;
     ctx.beginPath();ctx.arc(x,y,isNow?5.5:2.5,0,Math.PI*2);
-    ctx.fillStyle=isNow?'#fff':'rgba(255,210,80,.9)';ctx.fill();
+    ctx.fillStyle=isNow?'#fff':'rgba(255,210,80,1)';ctx.fill();
     if(isNow){
       ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,.3)';ctx.fill();
       ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,.1)';ctx.fill();

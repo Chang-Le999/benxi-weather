@@ -103,8 +103,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .chart-sec .ct{font-size:.8em;opacity:.75;padding:6px 0;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between}
 .chart-box{background:rgba(40,44,48,.28);border-radius:14px;padding:14px 10px 10px;position:relative;touch-action:pan-y;overflow:hidden}
 .chart-box.bright-bg{background:rgba(40,44,48,.28)}
-#chart-fx-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .4s}
-#chart-fx-bg.active{opacity:1}
 #chart-fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .4s}
 #chart-fx.active{opacity:1}
 #chart-fx .cloud{animation:drift 28s linear infinite;opacity:.3}
@@ -336,24 +334,12 @@ function drawChart(canvas,idx){
 
 function updateBgForDay(idx){
   var fx=document.getElementById('chart-fx');if(!fx)return;
-  var fxBg=document.getElementById('chart-fx-bg');
   var isToday=idx===todayIdx;
-  if(isToday){fx.innerHTML='';fx.classList.remove('active');if(fxBg){fxBg.classList.remove('active');fxBg.style.background=''}return}
-  // future day: render low-sat weather inside chart-box
+  if(isToday){fx.innerHTML='';fx.classList.remove('active');return}
+  // future day: render weather effects inside chart-box (no gradient overlay)
   var data=dayData[idx];if(!data)return;
   var wInfo=data.weather||'多云';
   fx.innerHTML='';
-  // add weather background gradient to chart-fx-bg (BEHIND canvas, not on top)
-  var bg='';
-  if(wInfo==='晴'){bg='linear-gradient(180deg,rgba(74,144,217,.7),rgba(135,206,235,.5),rgba(184,223,245,.4))'}
-  else if(wInfo==='多云'){bg='linear-gradient(180deg,rgba(74,144,217,.6),rgba(135,206,235,.45),rgba(184,223,245,.35))'}
-  else if(wInfo==='阴'){bg='linear-gradient(180deg,rgba(80,96,112,.7),rgba(112,128,160,.55),rgba(144,160,181,.45))'}
-  else if(wInfo.indexOf('雨')>-1){bg='linear-gradient(180deg,rgba(30,42,56,.8),rgba(46,62,80,.65),rgba(58,74,88,.55))'}
-  else if(wInfo.indexOf('雪')>-1){bg='linear-gradient(180deg,rgba(96,112,128,.6),rgba(128,144,160,.5),rgba(160,176,192,.4))'}
-  else if(wInfo==='雾'){bg='linear-gradient(180deg,rgba(90,101,112,.6),rgba(120,133,143,.5),rgba(144,154,165,.4))'}
-  else{bg='linear-gradient(180deg,rgba(74,144,217,.6),rgba(135,206,235,.45),rgba(184,223,245,.35))'}
-  if(fxBg){fxBg.style.background=bg;fxBg.classList.add('active')}
-  // render weather effects into chart-fx (rain/snow/clouds on TOP of canvas)
   // use precipitation mm to determine rain intensity, more reliable than text matching
   var mm=data.precip||0;
   var hasSnow=wInfo.indexOf('雪')>-1;
@@ -573,7 +559,7 @@ html+='</div>';
 
 html+='<div class="chart-sec">';
 html+='<div class="ct"><span id="chartTitle">'+dayData[currentDayIdx].label+' 气温·降水</span><span id="chartRain" style="font-size:.85em;opacity:.6"></span></div>';
-html+='<div class="chart-box'+((currentRealWeather==='晴'&&isDayNow)||currentRealWeather==='多云'||currentRealWeather==='阴'?' bright-bg':'')+'" id="chartBox"><div id="chart-fx-bg"></div><div id="chart-fx"></div><canvas id="h24"></canvas></div>';
+html+='<div class="chart-box'+((currentRealWeather==='晴'&&isDayNow)||currentRealWeather==='多云'||currentRealWeather==='阴'?' bright-bg':'')+'" id="chartBox"><div id="chart-fx"></div><canvas id="h24"></canvas></div>';
 html+='<div class="dots" id="dayDots">';
 for(var i=0;i<dayData.length;i++)html+='<span class="'+(i===currentDayIdx?'on':'')+'" onclick="jumpDay('+i+')"></span>';
 html+='</div></div>';

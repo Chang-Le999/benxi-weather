@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" style="background:#1a1a2e">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
@@ -8,14 +8,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="本溪天气">
 <meta name="theme-color" content="#1a1a2e">
-<style>html,body{background:#1a1a2e!important}</style>
 <link rel="manifest" href="manifest.json">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative;background:#1a1a2e}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;position:relative}
 
 /* dynamic bg base */
-#wbg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;transition:background 2s;background:#1a1a2e}
+#wbg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;transition:background 2s}
 #weather-fx{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;overflow:hidden;pointer-events:none}
 .wrap{max-width:420px;margin:0 auto;padding:16px 16px 30px;position:relative;z-index:1}
 
@@ -136,8 +135,6 @@ canvas{display:block;width:100%;height:160px;position:relative;z-index:1}
 </style>
 </head>
 <body>
-<noscript>请启用JavaScript</noscript>
-<script>window.onerror=function(m,u,l){document.body.innerHTML='<div style="color:#fff;padding:20px;font-size:14px;background:#1a1a2e;min-height:100vh">错误: '+m+' (行'+l+')</div>'}</script>
 <div id="wbg"></div>
 <div id="weather-fx"></div>
 <div class="wrap" id="app">
@@ -445,8 +442,11 @@ var today=new Date();
 var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
 currentHour=today.getHours();
 
+var dayCount=0;
 detail.forEach(function(d2,idx){
-  if(idx>=3)return;
+  if(d2.date<todayStr)return;
+  if(dayCount>=3)return;
+  dayCount++;
   var fc=fcMap[d2.date],pts=[];
   // fallback: if hi/lo invalid, estimate from passed data
   if(fc&&(fc.hi===null||fc.lo===null)){
@@ -460,11 +460,11 @@ detail.forEach(function(d2,idx){
       var t=interpTemp(h,fc.lo,fc.hi),r=0;
       if(fc.precip>0&&h>=8&&h<=19)r=fc.precip/12;
       // add jitter for future days to make curve more wavy
-      if(idx>0){var amp=(fc.hi-fc.lo)*0.12;t+=Math.round((Math.sin(h*2.7+idx*5)*amp)*10)/10}
+      if(dayCount>1){var amp=(fc.hi-fc.lo)*0.12;t+=Math.round((Math.sin(h*2.7+dayCount*5)*amp)*10)/10}
       pts.push({temp:t,rain:r,hour:h})
     }
   }
-  var lb=idx===0?'今天':(idx===1?'明天':'后天');
+  var lb=dayCount===1?'今天':(dayCount===2?'明天':'后天');
   dayData.push({date:d2.date,label:lb,points:pts,precip:fc?fc.precip:0,weather:d2.day.weather.info==='9999'?d2.night.weather.info:d2.day.weather.info});
 });
 for(var i=0;i<dayData.length;i++){if(dayData[i].date===todayStr){currentDayIdx=i;todayIdx=i;break}}

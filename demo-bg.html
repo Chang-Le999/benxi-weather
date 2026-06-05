@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>12种天气背景演示</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;color:#fff;background:#111;padding:12px}
+h1{font-size:1em;text-align:center;opacity:.6;margin-bottom:12px;font-weight:400}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{border-radius:12px;overflow:hidden;position:relative}
+.card-label{position:absolute;top:6px;left:8px;font-size:.7em;z-index:20;background:rgba(0,0,0,.45);padding:2px 6px;border-radius:4px;letter-spacing:.5px}
+/* === 12 backgrounds === */
+.bg-sunny-d{background:linear-gradient(180deg,#4a90d9,#87ceeb,#b8dff5)}
+.bg-sunny-n{background:linear-gradient(180deg,#0a0e2a,#141852,#1a1a3e)}
+.bg-cloudy{background:linear-gradient(180deg,#4a90d9,#87ceeb,#b8dff5)}
+.bg-overcast{background:linear-gradient(180deg,#506070,#7080a0,#90a0b5)}
+.bg-rain-l{background:linear-gradient(180deg,#2a3545,#3d5060,#4a6070)}
+.bg-rain-m{background:linear-gradient(180deg,#1e2a38,#2e3e50,#3a4a58)}
+.bg-rain-h{background:linear-gradient(180deg,#121a25,#1e2a38,#253545)}
+.bg-snow-l{background:linear-gradient(180deg,#607080,#8090a0,#a0b0c0)}
+.bg-snow-m{background:linear-gradient(180deg,#506070,#7080a0,#90a0b5)}
+.bg-snow-h{background:linear-gradient(180deg,#404f60,#5a6a80,#7080a0)}
+.bg-fog{background:linear-gradient(180deg,#5a6570,#78858f,#909aa5)}
+.bg-dust{background:linear-gradient(180deg,#6a5530,#8a7040,#a09060)}
+/* chart-box simulation */
+.chart-box{background:rgba(40,44,48,.28);border-radius:14px;padding:14px 10px 10px;position:relative;height:160px;overflow:hidden}
+.chart-fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;overflow:hidden;pointer-events:none}
+canvas{display:block;width:100%;height:130px;position:relative;z-index:1}
+/* weather fx */
+.stars{position:absolute;width:100%;height:40%;top:0;left:0}
+.stars i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+.cloud{position:absolute;animation:drift 28s linear infinite}
+.cloud .bl{position:absolute;border-radius:50%}
+.cloud .b1{width:40px;height:35px;left:20px;top:0;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.cloud .b2{width:46px;height:42px;left:4px;top:8px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.cloud .b3{width:38px;height:34px;left:38px;top:6px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.cloud .b4{width:78px;height:26px;left:4px;top:26px;border-radius:26px;background:#f8f8fa;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.cloud-1{top:18%;width:90px;height:52px}
+.cloud-2{top:34%;width:90px;height:52px;animation-duration:36s;transform:scale(.56)}
+@keyframes drift{from{left:-120px}to{left:calc(100% + 20px)}}
+.rain-layer{position:absolute;width:100%;height:100%;top:0;left:0;overflow:hidden}
+.rain-layer i{position:absolute;width:1.5px;background:linear-gradient(transparent,rgba(174,200,230,.5));border-radius:0 0 2px 2px;animation:fall linear infinite}
+.rain-l .rain-layer i{height:16px;animation-duration:2.5s}
+.rain-m .rain-layer i{height:22px;animation-duration:1.5s}
+.rain-h .rain-layer i{height:30px;width:2px;animation-duration:1s;background:linear-gradient(transparent,rgba(174,200,230,.7))}
+@keyframes fall{from{top:-30px}to{top:100%}}
+.lightning{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;animation:flash 4s ease-in-out infinite}
+@keyframes flash{0%,90%,100%{opacity:0}92%{opacity:.8}93%{opacity:0}95%{opacity:.5}96%{opacity:0}}
+.snow-layer{position:absolute;width:100%;height:100%;top:0;left:0;overflow:hidden}
+.snow-layer i{position:absolute;width:6px;height:6px;background:rgba(255,255,255,.7);border-radius:50%;animation:snowfall linear infinite}
+@keyframes snowfall{from{top:-10px;transform:translateX(0) rotate(0)}to{top:100%;transform:translateX(30px) rotate(360deg)}}
+.fog-overlay{position:absolute;width:100%;height:100%;top:0;left:0;background:rgba(200,210,220,.3);animation:fogmove 8s ease-in-out infinite alternate}
+@keyframes fogmove{from{opacity:.3}to{opacity:.6}}
+.dust-layer{position:absolute;width:100%;height:100%;top:0;left:0;overflow:hidden}
+.dust-layer i{position:absolute;width:3px;height:3px;background:rgba(180,150,80,.4);border-radius:50%;animation:dustblow linear infinite}
+@keyframes dustblow{from{left:-10px;transform:translateY(0)}to{left:100%;transform:translateY(-40px)}}
+</style>
+</head>
+<body>
+<h1>12种天气背景 · 折线图演示</h1>
+<div class="grid" id="grid"></div>
+<script>
+var TYPES=[
+  {id:'sunny-d',label:'☀️ 晴(白天)',cls:'bg-sunny-d',fx:'sunny-d'},
+  {id:'sunny-n',label:'🌙 晴(夜晚)',cls:'bg-sunny-n',fx:'sunny-n'},
+  {id:'cloudy',label:'⛅ 多云',cls:'bg-cloudy',fx:'cloudy'},
+  {id:'overcast',label:'☁️ 阴',cls:'bg-overcast',fx:'overcast'},
+  {id:'rain-l',label:'🌦️ 小雨',cls:'bg-rain-l',fx:'rain-l'},
+  {id:'rain-m',label:'🌧️ 中雨',cls:'bg-rain-m',fx:'rain-m'},
+  {id:'rain-h',label:'⛈️ 大雨',cls:'bg-rain-h',fx:'rain-h'},
+  {id:'snow-l',label:'🌨️ 小雪',cls:'bg-snow-l',fx:'snow-l'},
+  {id:'snow-m',label:'❄️ 中雪',cls:'bg-snow-m',fx:'snow-m'},
+  {id:'snow-h',label:'❄️ 大雪',cls:'bg-snow-h',fx:'snow-h'},
+  {id:'fog',label:'🌫️ 雾',cls:'bg-fog',fx:'fog'},
+  {id:'dust',label:'🏜️ 沙尘',cls:'bg-dust',fx:'dust'}
+];
+
+function makeFx(type,fxEl){
+  if(type==='sunny-n'){
+    var st=document.createElement('div');st.className='stars';
+    for(var i=0;i<30;i++){
+      var si=document.createElement('i');
+      si.style.left=Math.random()*100+'%';si.style.top=Math.random()*100+'%';
+      si.style.animationDelay=Math.random()*3+'s';si.style.animationDuration=(2+Math.random()*3)+'s';
+      var sz=1+Math.random()*2;si.style.width=sz+'px';si.style.height=sz+'px';
+      st.appendChild(si);
+    }
+    fxEl.appendChild(st);
+  }
+  if(type==='cloudy'||type==='overcast'||type==='sunny-d'){
+    for(var i=1;i<=2;i++){
+      var c=document.createElement('div');c.className='cloud cloud-'+i;
+      c.style.animationDelay=(-Math.random()*30)+'s';
+      ['b1','b2','b3','b4'].forEach(function(b){var el=document.createElement('div');el.className='bl '+b;c.appendChild(el)});
+      fxEl.appendChild(c);
+    }
+  }
+  if(type==='rain-l'||type==='rain-m'||type==='rain-h'){
+    var rl=document.createElement('div');rl.className='rain-layer';
+    var n=type==='rain-l'?20:(type==='rain-m'?40:60);
+    var rH=type==='rain-l'?16:(type==='rain-m'?22:30);
+    var rW=type==='rain-h'?'2px':'1.5px';
+    var rBg=type==='rain-h'?'linear-gradient(transparent,rgba(174,200,230,.7))':'linear-gradient(transparent,rgba(174,200,230,.5))';
+    for(var i=0;i<n;i++){
+      var ri=document.createElement('i');
+      var dur=(0.75+Math.random()*(type==='rain-h'?0.5:1.25));
+      ri.style.left=Math.random()*100+'%';ri.style.height=rH+'px';ri.style.width=rW;
+      ri.style.background=rBg;ri.style.animationDuration=dur+'s';
+      ri.style.animationDelay=(-Math.random()*dur)+'s';
+      ri.style.animationName='fall';ri.style.animationTimingFunction='linear';
+      ri.style.animationIterationCount='infinite';
+      rl.appendChild(ri);
+    }
+    fxEl.appendChild(rl);
+    if(type==='rain-h'){
+      var lt=document.createElement('div');lt.className='lightning';
+      lt.style.background='rgba(255,255,255,0)';lt.style.animationDelay=(Math.random()*3)+'s';
+      fxEl.appendChild(lt);
+    }
+  }
+  if(type==='snow-l'||type==='snow-m'||type==='snow-h'){
+    var sl=document.createElement('div');sl.className='snow-layer';
+    var n=type==='snow-l'?15:(type==='snow-m'?30:50);
+    for(var i=0;i<n;i++){
+      var si=document.createElement('i');
+      var dur=(5+Math.random()*8);
+      si.style.left=Math.random()*100+'%';si.style.animationDuration=dur+'s';
+      si.style.animationDelay=(-Math.random()*dur)+'s';
+      var sz=3+Math.random()*4;si.style.width=sz+'px';si.style.height=sz+'px';
+      si.style.background='rgba(255,255,255,.7)';si.style.borderRadius='50%';
+      si.style.position='absolute';si.style.animationName='snowfall';
+      si.style.animationTimingFunction='linear';si.style.animationIterationCount='infinite';
+      sl.appendChild(si);
+    }
+    fxEl.appendChild(sl);
+  }
+  if(type==='fog'){var fo=document.createElement('div');fo.className='fog-overlay';fxEl.appendChild(fo)}
+  if(type==='dust'){
+    var dl=document.createElement('div');dl.className='dust-layer';
+    for(var i=0;i<20;i++){
+      var di=document.createElement('i');
+      di.style.top=Math.random()*100+'%';
+      di.style.animationDuration=(2+Math.random()*4)+'s';
+      di.style.animationDelay=Math.random()*3+'s';
+      dl.appendChild(di);
+    }
+    fxEl.appendChild(dl);
+  }
+}
+
+function drawMiniChart(canvas){
+  var dpr=window.devicePixelRatio||1,w=canvas.clientWidth,h=canvas.clientHeight;
+  canvas.width=w*dpr;canvas.height=h*dpr;
+  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  // sample data: 0-23h temps
+  var temps=[8,7,6,5,5,6,8,11,14,17,19,21,22,22,21,20,18,16,14,12,11,10,9,8];
+  var rains=[0,0,0,0,0,0,0,0.5,1.2,0.8,0,0,0,0,0,0.3,0.6,0,0,0,0,0,0,0];
+  var tMin=3,tMax=25,rMax=1.5;
+  var padL=26,padR=8,padT=10,padB=20,cw=w-padL-padR,ch=h-padT-padB;
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){var y=padT+ch*i/4;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+    var tv=Math.round(tMax-(tMax-tMin)*i/4);ctx.fillStyle='rgba(255,255,255,.8)';ctx.font='bold 9px sans-serif';ctx.textAlign='right';ctx.fillText(tv+'°',padL-3,y+3)}
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='8px sans-serif';ctx.textAlign='center';
+  for(var i=0;i<24;i+=6){var x=padL+cw*i/23;ctx.fillText(i+':00',x,h-3)}
+  // rain bars
+  var barW=Math.max(2,cw/24*0.5);
+  for(var i=0;i<24;i++){if(rains[i]>0){
+    var x=padL+cw*i/23;var bh=(rains[i]/rMax)*ch*0.25;
+    ctx.fillStyle='rgba(40,130,255,.65)';ctx.fillRect(x-barW/2,padT+ch-bh,barW,bh)
+  }}
+  // line
+  ctx.beginPath();ctx.strokeStyle='rgba(255,210,80,1)';ctx.lineWidth=2;ctx.lineJoin='round';
+  for(var i=0;i<24;i++){var x=padL+cw*i/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+  ctx.stroke();
+  // dots
+  for(var i=0;i<24;i+=3){
+    var x=padL+cw*i/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));
+    ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,1)';ctx.fill();
+  }
+  // current hour highlight
+  var nowH=12;
+  var nx=padL+cw*nowH/23,ny=padT+ch*(1-(temps[nowH]-tMin)/(tMax-tMin));
+  ctx.beginPath();ctx.arc(nx,ny,4,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+  ctx.beginPath();ctx.arc(nx,ny,8,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,.3)';ctx.fill();
+}
+
+var grid=document.getElementById('grid');
+TYPES.forEach(function(t){
+  var card=document.createElement('div');card.className='card';
+  var label=document.createElement('div');label.className='card-label';label.textContent=t.label;
+  var box=document.createElement('div');box.className='chart-box';
+  var fx=document.createElement('div');fx.className='chart-fx '+t.fx;
+  makeFx(t.fx,fx);
+  var cvs=document.createElement('canvas');
+  box.appendChild(fx);box.appendChild(cvs);
+  card.appendChild(label);card.appendChild(box);
+  grid.appendChild(card);
+  setTimeout(function(){drawMiniChart(cvs)},50);
+});
+</script>
+</body>
+</html>

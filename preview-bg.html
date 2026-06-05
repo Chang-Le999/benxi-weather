@@ -6,14 +6,42 @@
 <title>12种天气整体效果预览</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:#fff;background:#000}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;color:#fff;background:#111;padding:8px}
+h1{font-size:.8em;text-align:center;opacity:.4;margin-bottom:8px;font-weight:400}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.phone{position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
+.phone-label{position:absolute;top:0;left:0;right:0;z-index:30;text-align:center;font-size:.6em;background:rgba(0,0,0,.5);padding:2px 0;letter-spacing:.5px}
 
-.section{position:relative;min-height:100vh;overflow:hidden;margin-bottom:2px}
-.section:last-child{margin-bottom:0}
-.bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
-.fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;overflow:hidden;pointer-events:none}
-.wrap{max-width:420px;margin:0 auto;padding:16px 16px 30px;position:relative;z-index:1}
-.badge{position:absolute;top:8px;right:8px;z-index:20;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:4px;font-size:.7em;letter-spacing:.5px}
+/* each phone is a scaled-down full page */
+.page{position:relative;width:100%;padding-bottom:220%;overflow:hidden}
+.page .bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
+.page .fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;overflow:hidden;pointer-events:none}
+.page .wrap{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;padding:8% 5% 5%}
+.page .wrap .city-bar{font-size:5.5vw;font-weight:600;letter-spacing:.5px;text-align:center;padding:4% 0 1%}
+.page .wrap .now{text-align:center;padding:4% 0}
+.page .wrap .now .temp{font-size:16vw;font-weight:200;line-height:1}
+.page .wrap .now .temp sup{font-size:.3em;vertical-align:super}
+.page .wrap .now .desc{font-size:4.5vw;margin-top:1%;opacity:.85}
+.page .wrap .now .feel{font-size:3.2vw;margin-top:1%;opacity:.5}
+.page .wrap .chart-sec{margin:2% 0 4%;position:relative;z-index:10}
+.page .wrap .chart-sec .ct{font-size:3.2vw;opacity:.75;padding:1% 0;display:flex;justify-content:space-between}
+.page .wrap .chart-box{background:rgba(40,44,48,.28);border-radius:8px;padding:4%;position:relative;overflow:hidden}
+.page .wrap .chart-box .chart-fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .4s}
+.page .wrap .chart-box .chart-fx.active{opacity:1}
+.page .wrap .chart-box .chart-fx .rain-layer i{opacity:.6}
+.page .wrap .chart-box .chart-fx .snow-layer i{opacity:.45}
+.page .wrap .chart-box canvas{display:block;width:100%;height:16vw;position:relative;z-index:1}
+.page .wrap .fc-title{font-size:3vw;opacity:.75;letter-spacing:.5px;margin:2% 0 1%}
+.page .wrap .fc{background:rgba(40,44,48,.28);border-radius:8px;padding:2% 4%}
+.page .wrap .fc-row{display:grid;grid-template-columns:22% 1fr 14% 16%;align-items:center;padding:2% 0;font-size:3vw;border-bottom:1px solid rgba(255,255,255,.06)}
+.page .wrap .fc-row:last-child{border:none}
+.page .wrap .fc-row .date{opacity:.7;font-size:2.8vw}
+.page .wrap .fc-row .winfo{display:flex;align-items:center;gap:1.5vw}
+.page .wrap .fc-row .winfo .icon{font-size:3.5vw}
+.page .wrap .fc-row .winfo .wind{font-size:2.5vw;opacity:.4}
+.page .wrap .fc-row .lo{text-align:right;opacity:.45}
+.page .wrap .fc-row .hi{text-align:right;font-weight:600}
+.page .wrap .upt{text-align:center;font-size:2.2vw;opacity:.25;padding:3% 0 0}
 
 /* 12 bg gradients */
 .bg.sunny-d{background:linear-gradient(180deg,#4a90d9,#87ceeb,#b8dff5)}
@@ -31,7 +59,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 
 /* fx */
 .stars{position:absolute;width:100%;height:40%;top:0;left:0}
-.stars i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+.stars i{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
 @keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
 .cloud{position:absolute;animation:drift 28s linear infinite}
 .cloud .bl{position:absolute;border-radius:50%}
@@ -56,58 +84,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .lightning{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;animation:flash 4s ease-in-out infinite}
 @keyframes flash{0%,90%,100%{opacity:0}92%{opacity:.8}93%{opacity:0}95%{opacity:.5}96%{opacity:0}}
 .snow-layer{position:absolute;width:100%;height:100%;top:0;left:0;overflow:hidden}
-.snow-layer i{position:absolute;width:6px;height:6px;background:rgba(255,255,255,.7);border-radius:50%;animation:snowfall linear infinite}
+.snow-layer i{position:absolute;background:rgba(255,255,255,.7);border-radius:50%;animation:snowfall linear infinite}
 @keyframes snowfall{from{top:-10px;transform:translateX(0) rotate(0)}to{top:100%;transform:translateX(30px) rotate(360deg)}}
 .fog-overlay{position:absolute;width:100%;height:100%;top:0;left:0;background:rgba(200,210,220,.3);animation:fogmove 8s ease-in-out infinite alternate}
 @keyframes fogmove{from{opacity:.3}to{opacity:.6}}
 .dust-layer{position:absolute;width:100%;height:100%;top:0;left:0;overflow:hidden}
 .dust-layer i{position:absolute;width:3px;height:3px;background:rgba(180,150,80,.4);border-radius:50%;animation:dustblow linear infinite}
 @keyframes dustblow{from{left:-10px;transform:translateY(0)}to{left:100%;transform:translateY(-40px)}}
-
-/* content styles */
-.city-bar{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 0 4px;font-size:1.1em;font-weight:600;letter-spacing:1px}
-.now{text-align:center;padding:18px 0 8px}
-.now .temp{font-size:4.2em;font-weight:200;line-height:1}
-.now .temp sup{font-size:.35em;vertical-align:super}
-.now .desc{font-size:1.05em;margin-top:4px;opacity:.85}
-.now .feel{font-size:.78em;margin-top:5px;opacity:.5}
-.chart-sec{margin:6px 0 14px;position:relative;z-index:10}
-.chart-sec .ct{font-size:.8em;opacity:.75;padding:6px 0;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between}
-.chart-box{background:rgba(40,44,48,.28);border-radius:14px;padding:14px 10px 10px;position:relative;overflow:hidden}
-.chart-box .chart-fx{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .4s}
-.chart-box .chart-fx.active{opacity:1}
-.chart-box .chart-fx .rain-layer i{opacity:.6}
-.chart-box .chart-fx .snow-layer i{opacity:.45}
-canvas{display:block;width:100%;height:160px;position:relative;z-index:1}
-.fc-title{font-size:.78em;opacity:.75;letter-spacing:1px}
-.fc{background:rgba(40,44,48,.28);border-radius:14px;padding:6px 12px;position:relative;z-index:10}
-.fc-row{display:grid;grid-template-columns:56px 1fr 36px 40px;align-items:center;padding:10px 0;font-size:.82em;border-bottom:1px solid rgba(255,255,255,.06)}
-.fc-row:last-child{border:none}
-.fc-row .date{opacity:.7}
-.fc-row .date .wk{font-size:.7em;opacity:.5;display:block}
-.fc-row .winfo{display:flex;align-items:center;gap:6px}
-.fc-row .winfo .icon{font-size:1.1em}
-.fc-row .winfo .wind{font-size:.7em;opacity:.4}
-.fc-row .lo{text-align:right;opacity:.45}
-.fc-row .hi{text-align:right;font-weight:600}
-.upt{text-align:center;font-size:.68em;opacity:.25;padding:16px 0 0}
 </style>
 </head>
 <body>
+<h1>12种天气整体效果</h1>
+<div class="grid" id="grid"></div>
 <script>
 var TYPES=[
-  {id:'sunny-d',label:'☀️ 晴(白天)',temp:'26°',desc:'☀️ 晴',feel:'体感 28°'},
-  {id:'sunny-n',label:'🌙 晴(夜晚)',temp:'18°',desc:'🌙 晴',feel:'体感 16°'},
-  {id:'cloudy',label:'⛅ 多云',temp:'22°',desc:'⛅ 多云',feel:'体感 21°'},
-  {id:'overcast',label:'☁️ 阴',temp:'19°',desc:'☁️ 阴',feel:'体感 18°'},
-  {id:'rain-l',label:'🌦️ 小雨',temp:'16°',desc:'🌦️ 小雨',feel:'体感 14°'},
-  {id:'rain-m',label:'🌧️ 中雨',temp:'13°',desc:'🌧️ 中雨',feel:'体感 11°'},
-  {id:'rain-h',label:'⛈️ 大雨',temp:'10°',desc:'⛈️ 大雨',feel:'体感 7°'},
-  {id:'snow-l',label:'🌨️ 小雪',temp:'2°',desc:'🌨️ 小雪',feel:'体感 -1°'},
-  {id:'snow-m',label:'❄️ 中雪',temp:'-1°',desc:'❄️ 中雪',feel:'体感 -5°'},
-  {id:'snow-h',label:'❄️ 大雪',temp:'-4°',desc:'❄️ 大雪',feel:'体感 -9°'},
-  {id:'fog',label:'🌫️ 雾',temp:'8°',desc:'🌫️ 雾',feel:'体感 6°'},
-  {id:'dust',label:'🏜️ 沙尘',temp:'20°',desc:'🏜️ 扬沙',feel:'体感 17°'}
+  {id:'sunny-d',label:'☀️ 晴(白天)',temp:'26',desc:'☀️ 晴',feel:'体感 28°'},
+  {id:'sunny-n',label:'🌙 晴(夜晚)',temp:'18',desc:'🌙 晴',feel:'体感 16°'},
+  {id:'cloudy',label:'⛅ 多云',temp:'22',desc:'⛅ 多云',feel:'体感 21°'},
+  {id:'overcast',label:'☁️ 阴',temp:'19',desc:'☁️ 阴',feel:'体感 18°'},
+  {id:'rain-l',label:'🌦️ 小雨',temp:'16',desc:'🌦️ 小雨',feel:'体感 14°'},
+  {id:'rain-m',label:'🌧️ 中雨',temp:'13',desc:'🌧️ 中雨',feel:'体感 11°'},
+  {id:'rain-h',label:'⛈️ 大雨',temp:'10',desc:'⛈️ 大雨',feel:'体感 7°'},
+  {id:'snow-l',label:'🌨️ 小雪',temp:'2',desc:'🌨️ 小雪',feel:'体感 -1°'},
+  {id:'snow-m',label:'❄️ 中雪',temp:'-1',desc:'❄️ 中雪',feel:'体感 -5°'},
+  {id:'snow-h',label:'❄️ 大雪',temp:'-4',desc:'❄️ 大雪',feel:'体感 -9°'},
+  {id:'fog',label:'🌫️ 雾',temp:'8',desc:'🌫️ 雾',feel:'体感 6°'},
+  {id:'dust',label:'🏜️ 沙尘',temp:'20',desc:'🏜️ 扬沙',feel:'体感 17°'}
 ];
 
 var FC=[
@@ -162,7 +164,6 @@ function makeChartFx(type,fxEl){
     var rBg=cls==='rain-h'?'linear-gradient(transparent,rgba(174,200,230,.7))':'linear-gradient(transparent,rgba(174,200,230,.5))';
     for(var i=0;i<n;i++){var ri=document.createElement('i');var dur=(0.75+Math.random()*(cls==='rain-h'?0.5:1.25));ri.style.left=Math.random()*100+'%';ri.style.height=rH+'px';ri.style.width=rW;ri.style.background=rBg;ri.style.animationDuration=dur+'s';ri.style.animationDelay=(-Math.random()*dur)+'s';ri.style.animationName='fall';ri.style.animationTimingFunction='linear';ri.style.animationIterationCount='infinite';rl.appendChild(ri)}
     fxEl.appendChild(rl);
-    if(cls==='rain-h'){var lt=document.createElement('div');lt.className='lightning';lt.style.background='rgba(255,255,255,0)';lt.style.animationDelay=(Math.random()*3)+'s';fxEl.appendChild(lt)}
   }
   if(cls==='snow-l'||cls==='snow-m'||cls==='snow-h'){
     var sl=document.createElement('div');sl.className='snow-layer';
@@ -181,63 +182,58 @@ function drawChart(canvas){
   var temps=[8,7,6,5,5,6,8,11,14,17,19,21,22,22,21,20,18,16,14,12,11,10,9,8];
   var rains=[0,0,0,0,0,0,0,.5,1.2,2.5,3.1,2.0,.8,.3,0,0,.5,1.0,0,0,0,0,0,0];
   var tMin=3,tMax=25,rMax=4;
-  var padL=30,padR=14,padT=14,padB=24,cw=w-padL-padR,ch=h-padT-padB;
-  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
-  for(var i=0;i<=4;i++){var y=padT+ch*i/4;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
-    var tv=Math.round(tMax-(tMax-tMin)*i/4);ctx.fillStyle='rgba(255,255,255,.8)';ctx.font='bold 10px sans-serif';ctx.textAlign='right';ctx.fillText(tv+'°',padL-4,y+3)}
-  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
-  for(var i=0;i<24;i+=3){var x=padL+cw*i/23;ctx.fillText(i+':00',x,h-4)}
-  var barW=Math.max(3,cw/24*0.6);
-  for(var i=0;i<24;i++){if(rains[i]>0){var x=padL+cw*i/23;var bh=(rains[i]/rMax)*ch*0.35;ctx.fillStyle='rgba(40,130,255,.65)';ctx.fillRect(x-barW/2,padT+ch-bh,barW,bh)}}
-  ctx.beginPath();ctx.strokeStyle='rgba(255,210,80,1)';ctx.lineWidth=2.5;ctx.lineJoin='round';
+  var padL=18,padR=8,padT=6,padB=10,cw=w-padL-padR,ch=h-padT-padB;
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=.5;
+  for(var i=0;i<=3;i++){var y=padT+ch*i/3;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke()}
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='bold 5px sans-serif';ctx.textAlign='right';
+  for(var i=0;i<=3;i++){var y=padT+ch*i/3;var tv=Math.round(tMax-(tMax-tMin)*i/3);ctx.fillText(tv+'°',padL-2,y+2)}
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='4px sans-serif';ctx.textAlign='center';
+  [0,6,12,18,23].forEach(function(i){var x=padL+cw*i/23;ctx.fillText(i+'',x,h-1)});
+  var barW=Math.max(1.5,cw/24*0.5);
+  for(var i=0;i<24;i++){if(rains[i]>0){var x=padL+cw*i/23;var bh=(rains[i]/rMax)*ch*0.3;ctx.fillStyle='rgba(40,130,255,.6)';ctx.fillRect(x-barW/2,padT+ch-bh,barW,bh)}}
+  ctx.beginPath();ctx.strokeStyle='rgba(255,210,80,1)';ctx.lineWidth=1.2;ctx.lineJoin='round';
   for(var i=0;i<24;i++){var x=padL+cw*i/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
   ctx.stroke();
-  for(var i=0;i<24;i+=3){var x=padL+cw*i/23,y=padT+ch*(1-(temps[i]-tMin)/(tMax-tMin));ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,1)';ctx.fill()}
   var nowH=12,nx=padL+cw*nowH/23,ny=padT+ch*(1-(temps[nowH]-tMin)/(tMax-tMin));
-  ctx.beginPath();ctx.arc(nx,ny,5.5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
-  ctx.beginPath();ctx.arc(nx,ny,10,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,.3)';ctx.fill();
-  ctx.beginPath();ctx.arc(nx,ny,16,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,.1)';ctx.fill();
+  ctx.beginPath();ctx.arc(nx,ny,2.5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+  ctx.beginPath();ctx.arc(nx,ny,4,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,.3)';ctx.fill();
 }
 
-// build 12 sections
+var grid=document.getElementById('grid');
 TYPES.forEach(function(t){
-  var sec=document.createElement('div');sec.className='section';
-  // bg
+  var phone=document.createElement('div');phone.className='phone';
+  var label=document.createElement('div');label.className='phone-label';label.textContent=t.label;
+  var page=document.createElement('div');page.className='page';
   var bg=document.createElement('div');bg.className='bg '+t.id;
-  // fx
   var fx=document.createElement('div');fx.className='fx';
   makeFx(t.id,fx);
-  // badge
-  var badge=document.createElement('div');badge.className='badge';badge.textContent=t.label;
 
-  // content
   var wrap=document.createElement('div');wrap.className='wrap';
-  var html='';
-  html+='<div class="city-bar"><svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#fff;opacity:.7"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>本溪</div>';
-  html+='<div class="now"><div class="temp">'+t.temp+'<sup>°</sup></div><div class="desc">'+t.desc+'</div><div class="feel">'+t.feel+'</div></div>';
-  html+='<div class="chart-sec"><div class="ct"><span>今天 气温·降水</span><span style="font-size:.85em;opacity:.6">3.2mm 小雨</span></div>';
-  html+='<div class="chart-box"><div class="chart-fx" id="cf-'+t.id+'"></div><canvas id="cv-'+t.id+'"></canvas></div></div>';
-  html+='<div class="fc-title">7日预报</div><div class="fc">';
+  var h='';
+  h+='<div class="city-bar">📍 本溪</div>';
+  h+='<div class="now"><div class="temp">'+t.temp+'<sup>°</sup></div><div class="desc">'+t.desc+'</div><div class="feel">'+t.feel+'</div></div>';
+  h+='<div class="chart-sec"><div class="ct"><span>今天 气温·降水</span><span style="opacity:.6">3.2mm</span></div>';
+  h+='<div class="chart-box"><div class="chart-fx" id="cf-'+t.id+'"></div><canvas id="cv-'+t.id+'"></canvas></div></div>';
+  h+='<div class="fc-title">7日预报</div><div class="fc">';
   FC.forEach(function(f){
-    html+='<div class="fc-row"><div class="date">'+(f.label||f.wk)+(f.wk&&f.label?'<span class="wk">'+f.wk+'</span>':'')+'</div>';
-    html+='<div class="winfo"><span class="icon">'+f.icon+'</span><span>'+f.w+'</span><span class="wind">'+f.wind+'</span></div>';
-    html+='<div class="lo">'+f.lo+'</div><div class="hi">'+f.hi+'</div></div>';
+    h+='<div class="fc-row"><div class="date">'+(f.label||f.wk)+'</div>';
+    h+='<div class="winfo"><span class="icon">'+f.icon+'</span><span>'+f.w+'</span><span class="wind">'+f.wind+'</span></div>';
+    h+='<div class="lo">'+f.lo+'</div><div class="hi">'+f.hi+'</div></div>';
   });
-  html+='</div>';
-  html+='<div class="upt">中央气象台 · 演示数据</div>';
-  wrap.innerHTML=html;
+  h+='</div>';
+  h+='<div class="upt">中央气象台 · 演示</div>';
+  wrap.innerHTML=h;
 
-  sec.appendChild(bg);sec.appendChild(fx);sec.appendChild(badge);sec.appendChild(wrap);
-  document.body.appendChild(sec);
+  page.appendChild(bg);page.appendChild(fx);page.appendChild(wrap);
+  phone.appendChild(label);phone.appendChild(page);
+  grid.appendChild(phone);
 
-  // chart fx
   var cf=wrap.querySelector('.chart-fx');
   makeChartFx(t.id,cf);
-  // draw chart
   setTimeout(function(){
     var cv=document.getElementById('cv-'+t.id);
     if(cv)drawChart(cv);
-  },100);
+  },150);
 });
 </script>
 </body>

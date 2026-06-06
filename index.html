@@ -165,21 +165,26 @@ function setWeatherBg(weather,hour){
   var bg=document.getElementById('wbg');if(!bg)return;
   var w=weather,h=hour;
   var isDay=h>=sunTimes.rise&&h<sunTimes.set;
-  // determine bg class
+  // determine bg class — use indexOf for compound weather like "小雨转阴"
   var cls='';
   if(w==='晴'){
     cls=isDay?'sunny-d':'sunny-n';
   }else if(w==='多云'){
     cls=isDay?'cloudy':'overcast';
   }else if(w==='阴'){cls='overcast';
-  }else if(w==='小雨'||w==='阵雨'){cls='rain-l';
-  }else if(w==='中雨'){cls='rain-m';
-  }else if(w==='大雨'||w==='暴雨'||w==='雷阵雨'){cls='rain-h';
-  }else if(w==='小雪'){cls='snow-l';
-  }else if(w==='中雪'){cls='snow-m';
-  }else if(w==='大雪'||w==='暴雪'){cls='snow-h';
-  }else if(w==='雾'){cls='fog';
-  }else if(w==='沙尘暴'||w==='扬沙'||w==='浮尘'){cls='dust';
+  }else if(w.indexOf('雷阵雨')>-1){cls='rain-h';
+  }else if(w.indexOf('暴雨')>-1){cls='rain-h';
+  }else if(w.indexOf('大雨')>-1){cls='rain-h';
+  }else if(w.indexOf('中雨')>-1){cls='rain-m';
+  }else if(w.indexOf('小雨')>-1||w.indexOf('阵雨')>-1||w.indexOf('毛毛雨')>-1){cls='rain-l';
+  }else if(w.indexOf('雨')>-1){cls='rain-l';
+  }else if(w.indexOf('暴雪')>-1){cls='snow-h';
+  }else if(w.indexOf('大雪')>-1){cls='snow-h';
+  }else if(w.indexOf('中雪')>-1){cls='snow-m';
+  }else if(w.indexOf('小雪')>-1||w.indexOf('阵雪')>-1){cls='snow-l';
+  }else if(w.indexOf('雪')>-1){cls='snow-l';
+  }else if(w.indexOf('雾')>-1||w.indexOf('霾')>-1){cls='fog';
+  }else if(w.indexOf('沙')>-1||w.indexOf('尘')>-1){cls='dust';
   }else{
     cls=isDay?'cloudy':'overcast';
   }

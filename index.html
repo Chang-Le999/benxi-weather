@@ -224,12 +224,21 @@ function setWeatherBg(weather,hour){
   if(cls==='rain-l'||cls==='rain-m'||cls==='rain-h'){
     var rl=document.createElement('div');rl.className='rain-layer';
     var n=cls==='rain-l'?30:(cls==='rain-m'?60:100);
+    var rH=cls==='rain-l'?16:(cls==='rain-m'?22:30);
+    var rW=cls==='rain-h'?'2px':'1.5px';
+    var rBg=cls==='rain-h'?'linear-gradient(transparent,rgba(174,200,230,.7))':'linear-gradient(transparent,rgba(174,200,230,.5))';
     for(var i=0;i<n;i++){
       var ri=document.createElement('i');
       var dur=(0.75+Math.random()*(cls==='rain-h'?0.5:1.25));
       ri.style.left=Math.random()*100+'%';
+      ri.style.height=rH+'px';
+      ri.style.width=rW;
+      ri.style.background=rBg;
       ri.style.animationDuration=dur+'s';
       ri.style.animationDelay=(-Math.random()*dur)+'s';
+      ri.style.animationName='fall';
+      ri.style.animationTimingFunction='linear';
+      ri.style.animationIterationCount='infinite';
       rl.appendChild(ri);
     }
     fx.appendChild(rl);

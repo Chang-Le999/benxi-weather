@@ -516,7 +516,7 @@ detail.forEach(function(d2,idx){
 for(var i=0;i<dayData.length;i++){if(dayData[i].date===todayStr){currentDayIdx=i;todayIdx=i;break}}
 
 // Fetch Open-Meteo hourly data to supplement today's chart with full-day forecast
-fetch('https://api.open-meteo.com/v1/forecast?latitude=41.30&longitude=123.77&hourly=temperature_2m,precipitation,weather_code&daily=precipitation_sum,weather_code&timezone=Asia/Shanghai&forecast_days=3').then(function(r){return r.json()}).then(function(om){
+fetch('https://api.open-meteo.com/v1/forecast?latitude=41.30&longitude=123.77&current=weather_code,precipitation&hourly=temperature_2m,precipitation,weather_code&daily=precipitation_sum,weather_code&timezone=Asia/Shanghai&forecast_days=3').then(function(r){return r.json()}).then(function(om){
   if(!om||!om.hourly)return;
   var omH=om.hourly,omTimes=omH.time,omTemps=omH.temperature_2m,omRain=omH.precipitation;
   // build hourly map
@@ -559,6 +559,30 @@ fetch('https://api.open-meteo.com/v1/forecast?latitude=41.30&longitude=123.77&ho
   if(c)drawChart(c,currentDayIdx);
   // re-apply weather fx in case precip changed (affects rain animation level)
   updateBgForDay(currentDayIdx);
+  // re-evaluate today's background using Open-Meteo current weather if NMC didn't trigger rain/snow
+  var bgEl=document.getElementById('wbg');
+  var curCls=bgEl?bgEl.className:'';
+  if(curCls.indexOf('rain')<0&&curCls.indexOf('snow')<0&&om.current){
+    var omNow=om.current;
+    var omPrecip=omNow.precipitation||0;
+    var omCode=omNow.weather_code||0;
+    // WMO codes: 51-55 drizzle, 56-57 freezing drizzle, 61-65 rain, 66-67 freezing rain, 71-77 snow, 80-82 showers, 85-86 snow showers, 95-99 thunderstorm
+    var isRainCode=(omCode>=51&&omCode<=67)||(omCode>=80&&omCode<=82)||(omCode>=95&&omCode<=99);
+    var isSnowCode=(omCode>=71&&omCode<=77)||(omCode>=85&&omCode<=86);
+    var nowH=new Date().getHours();
+    if(isRainCode||omPrecip>0&&!isSnowCode){
+      // determine rain level from WMO code or precipitation
+      var rCls='rain-l';
+      if(omCode>=63||omCode>=81||omPrecip>=10)rCls='rain-m';
+      if(omCode>=65||omCode>=82||omPrecip>=25)rCls='rain-h';
+      setWeatherBg(rCls==='rain-l'?'小雨':(rCls==='rain-m'?'中雨':'大雨'),nowH);
+    }else if(isSnowCode){
+      var sCls='snow-l';
+      if(omCode>=73||omPrecip>=5)sCls='snow-m';
+      if(omCode>=75||omPrecip>=10)sCls='snow-h';
+      setWeatherBg(sCls==='snow-l'?'小雪':(sCls==='snow-m'?'中雪':'大雪'),nowH);
+    }
+  }
 }).catch(function(e){console.warn('Open-Meteo fallback failed:',e)});
 
 var html='';

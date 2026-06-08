@@ -608,7 +608,7 @@ html+='<div class="now">';
 var curTemp=parseFloat(w.temperature);if(curTemp>900||isNaN(curTemp))curTemp='--';else curTemp=Math.round(curTemp);
 var curFeel=parseFloat(w.feelst);if(curFeel>900||isNaN(curFeel))curFeel='--';else curFeel=Math.round(curFeel);
 html+='<div class="temp">'+curTemp+'<sup>°</sup></div>';
-html+='<div class="desc">'+ico(w.info)+' '+w.info+'</div>';
+html+='<div class="desc">当前天气：'+ico(w.info)+' '+w.info+'</div>';
 html+='<div class="feel">体感 '+curFeel+'°</div>';
 html+='</div>';
 

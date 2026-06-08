@@ -355,7 +355,7 @@ function drawChart(canvas,idx){
     ctx.beginPath();ctx.arc(sp.x,sp.y,5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
     ctx.beginPath();ctx.arc(sp.x,sp.y,3,0,Math.PI*2);ctx.fillStyle='rgba(255,210,80,1)';ctx.fill();
   }
-  var title=document.getElementById('chartTitle');if(title)title.textContent=data.label+' 气温·降水';
+  var title=document.getElementById('chartTitle');if(title)title.textContent=data.label+' 全天气温和降水';
   var rainEl=document.getElementById('chartRain');
   if(rainEl){var mm=data.precip;rainEl.textContent=mm>0?mm+'mm '+rainLvl(mm):''}
   var dotsEl=document.getElementById('dayDots');
@@ -613,7 +613,7 @@ html+='<div class="feel">体感 '+curFeel+'°</div>';
 html+='</div>';
 
 html+='<div class="chart-sec">';
-html+='<div class="ct"><span id="chartTitle">'+dayData[currentDayIdx].label+' 气温·降水</span><span id="chartRain" style="font-size:.85em;opacity:.6"></span></div>';
+html+='<div class="ct"><span id="chartTitle">'+dayData[currentDayIdx].label+' 全天气温和降水</span><span id="chartRain" style="font-size:.85em;opacity:.6"></span></div>';
 html+='<div class="chart-box'+((currentRealWeather==='晴'&&isDayNow)||currentRealWeather==='多云'||currentRealWeather==='阴'?' bright-bg':'')+'" id="chartBox"><div id="chart-fx"></div><canvas id="h24"></canvas><div id="chartTip"></div></div>';
 html+='<div class="dots" id="dayDots">';
 for(var i=0;i<dayData.length;i++)html+='<span class="'+(i===currentDayIdx?'on':'')+'" onclick="jumpDay('+i+')"></span>';
